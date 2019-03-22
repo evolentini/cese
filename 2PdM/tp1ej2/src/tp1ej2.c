@@ -3,7 +3,7 @@
  ** ALL RIGHTS RESERVED, DON'T USE OR PUBLISH THIS FILE WITHOUT AUTORIZATION
  *************************************************************************************************/
 
-/** @file tp1ej21.c
+/** @file tp1ej2.c
  ** @brief Programa principal del Ejercicio 2 del Trabajo Practico 1
  **
  ** Programa que controla los led mediante las teclas, con las tecla TEC_2 la secuencia se 
@@ -27,6 +27,11 @@
 
 /* === Definiciones de funciones internas =====================================================- */
 
+/**
+ * @ brief Determina la tecla presionada
+ * 
+ * @return  Numero de tecla presionada, o un numero negativo si no hay ninguna preisonada.
+ */
 int tecla_presionada(void) {
    int resultado = -1;
 
@@ -44,6 +49,16 @@ int tecla_presionada(void) {
 
 /* === Definiciones de funciones externas ====================================================== */
 
+/**
+ * Respuestas a las preguntas planteadas
+ * 1) Las teclas tienen prioridad. Si mientras esta presionada una tecla se presiona otra con un
+ * numero menor, entonces es equivalente a soltar la tecla inicial.  Si se presiona una con un
+ * numero mayor, entonces se ignora.
+ * 
+ * 2) Si se presiona una tecla mientras un led esta encendido se ignora, y si se mantiene 
+ * presionada hasta despues de que se apaga el led, entonces el timepo comienza a contarse
+ * desde que se apago el led.
+ */
 void main(void) {
    // Constante con los leds asociados a cada tecla
    const int leds[] = {

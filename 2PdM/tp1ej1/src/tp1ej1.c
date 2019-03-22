@@ -27,6 +27,11 @@
 
 /* === Definiciones de funciones internas =====================================================- */
 
+/**
+ * @ brief Cambia el valor de la variable en funcion de la tecla apretada
+ * 
+ * @param[in,out]    actual   Indice de la secuencia a utilizar
+ */
 void cambiar_sentido(int * actual) {
    if (gpioRead(TEC2) == 0) {
       *actual = 0;
