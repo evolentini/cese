@@ -24,3 +24,7 @@ Temporary Items
 .apdisk
 
 #Specific project
+*.d
+*.o
+**/out/**
+
