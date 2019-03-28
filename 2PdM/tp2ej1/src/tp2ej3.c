@@ -36,21 +36,37 @@ void main(void) {
     };
 
     const gpio_t secuencia_n[] = {
-        LEDR, LEDB, LEDR, LEDG, LED2, LED1, LED2, LED3,
+        LED1, LED2, LED1, LED3, LED1, LED2, LED3
     };
+
+    led_parpadeo_t parpadeo_azul;
+    led_parpadeo_t parpadeo_rojo;
+    led_parpadeo_t parpadeo_verde;
+    led_secuencia_t secuencia_leds;
 
     /* Inicializar la placa */
     boardConfig();
 
-    // LED_parpadear(LEDB, 1000);
-
-    LED_parpadear_n_veces(LEDR, 600, 5);
-
+    /* Ejemplos de uso de las funciones bloqueantes */
+    #if(0)
+    LED_parpadear_n_vecesLEDR, 600, 5);
+    LED_parpadearLEDB, 1000);
     LED_secuencia_arbitraria(200, secuencia);
-
     LED_secuencia_arbitraria_n(400, secuencia_n, 8);
+    #endif
+
+    /* Configuración de tres parpadeos y una secuencia no bloqueantes */
+    parpadeo_azul = LED_iniciar_parpadeo(LEDB, 200, 0);
+    parpadeo_rojo = LED_iniciar_parpadeo(LEDR, 400, 4);
+    parpadeo_verde = LED_iniciar_parpadeo(LEDG, 800, 8);
+    secuencia_leds = LED_iniciar_secuencia(400, secuencia_n, 7);
 
     while(1) {
+        /* Refresco de los parpadeos y la secuencia */
+        LED_mantener_parpadeo(parpadeo_azul);
+        LED_mantener_parpadeo(parpadeo_rojo);
+        LED_mantener_parpadeo(parpadeo_verde);
+        LED_mantener_secuencia(secuencia_leds);
     }
 }
 /* === Ciere de documentacion ================================================================== */
