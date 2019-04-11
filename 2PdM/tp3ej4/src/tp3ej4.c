@@ -122,12 +122,34 @@ void modo_gpio(estado_tecla_t * estados, int cantidad) {
 }
 
 void modo_adc(void) {
+    const char * MENSAJES[] = {
+        "Ingresando al modo ADC (Presione 9 para salir)"
+        TERMINAL_NUEVA_LINEA TERMINAL_NUEVA_LINEA TERMINAL_NUEVA_LINEA,
+        "Valor Actual ADC: " TERMINAL_TEXTO_VERDE "%04d" TERMINAL_TEXTO_BLANCO,
+    };
+
     char opcion;
-    terminal_escribir("Ingresando al modo ADC (Presione 9 para salir)");
-    terminal_escribir(TERMINAL_NUEVA_LINEA);
+    uint16_t valor;
+    uint32_t espera;
+    char mensaje[64];
+
+    /* Muestra el mensaje de bienvenida */ 
+    terminal_escribir(MENSAJES[0]);
+
+    espera = 0;
+    adcConfig(ADC_ENABLE);
     do {
+        /* Refresca el estado de las teclas en pantalla perioricamente */
+        if ((tickRead() - espera) > 200) {
+            valor = adcRead(CH1);
+            sprintf(mensaje, MENSAJES[1], valor);
+
+            terminal_refrescar(mensaje);
+            espera = tickRead();
+        }
         opcion = terminal_opcion("9");
     } while (opcion != '9');
+    adcConfig(ADC_DISABLE);
 }
 
 /* === Definiciones de funciones externas ====================================================== */
@@ -162,7 +184,7 @@ void main(void) {
             opcion = terminal_opcion("12");
         } while (opcion == 0);
         
-        if (opcion = '1') {
+        if (opcion == '1') {
             modo_gpio(estado_teclas, cantidad_teclas);
         } else {
             modo_adc();
