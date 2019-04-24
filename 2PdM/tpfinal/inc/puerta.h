@@ -18,7 +18,7 @@
  ** @{ */
 
 /* === Inclusiones de archivos externos ======================================================== */
-#include "sapi.h"
+#include "gpio.h"
 
 /* === Cabecera C++ ============================================================================ */
 #ifdef __cplusplus
@@ -28,9 +28,6 @@ extern "C" {
 /* === Definicion y Macros ===================================================================== */
 
 /* === Declaraciones de tipos de datos ========================================================= */
-
-//! Tipo de datos para la definicion de un terminal digital de entrada/salida
-typedef gpioMap_t gpio_t;
 
 //! Tipo de datos para la definicion de un tiempo de espera
 typedef uint16_t tiempo_t;
@@ -80,7 +77,7 @@ typedef void (*puerta_evento_t)(puerta_t puerta, puerta_estado_t estado);
 
 /* === Declaraciones de funciones externas ===================================================== */
 
-/** @brief  Configura la supervision de una tecla
+/** @brief  Configura la supervision de una puerta
  * 
  * @param[in]   configuracion    Estructura con la descripcion y configuracion de la puerta
  * 
@@ -88,17 +85,17 @@ typedef void (*puerta_evento_t)(puerta_t puerta, puerta_estado_t estado);
  */
 puerta_t PuertaConfigurar(const puerta_configuracion_t * configuracion, puerta_evento_t evento);
 
-/** @brief Libera la cerradura para que el usuario pueda abrir la puerta
- * 
- * @param[in]   tecla       Descriptor devuelto por la funcion al configurar la tecla
- */
-void PuertaLiberar(puerta_t puerta);
-
 /** @brief Actualiza el estado de una puerta
  * 
- * @param[in]   tecla       Descriptor devuelto por la funcion al configurar la tecla
+ * @param[in]   puerta       Descriptor devuelto por la funcion al configurar la puerta
  */
 puerta_estado_t PuertaActualizar(puerta_t puerta);
+
+/** @brief Libera la cerradura para que el usuario pueda abrir la puerta
+ * 
+ * @param[in]   puerta       Descriptor devuelto por la funcion al configurar la puerta
+ */
+void PuertaLiberar(puerta_t puerta);
 
 /* === Ciere de documentacion ================================================================== */
 #ifdef __cplusplus

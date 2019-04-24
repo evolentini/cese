@@ -13,7 +13,8 @@
 #include "seos_pont_2014_isr.h"       // <= dispatcher and task management header
 #include "seos_pont_2014_scheduler.h" // <= scheduler and system initialization header
 
-#include "task1.h"
+#include "pulsador.h"
+#include "accesos.h"
 
 /*==================[definiciones y macros]==================================*/
 
@@ -29,30 +30,24 @@
 
 // FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE ENCENDIDO O RESET.
 int main( void ){
+   void * puerta;
+   void * pulsador;
 
    // ---------- CONFIGURACIONES ------------------------------
    // Inicializar y configurar la plataforma
    boardConfig();
 
-   task1_Init(LEDB);
-   task1_Init(LED1);
-   task1_Init(LED2);
+   puerta = AccesosConfigurar(NULL);
+   pulsador = PulsadorConfigurar(puerta);
 
    // FUNCION que inicializa el planificador de tareas
    schedulerInit();
 
-   // Se agrega la tarea tarea1 al planificador
-   schedulerAddTask( task1_Update, // funcion de tarea a a�adir
-                     (void*)LEDB,
-                     0,            // offset de ejecucion en ticks
-                     100           // periodicidad de ejecucion en ticks
-                   );
+   // Se agrega la tarea del control de accesos al planificador
+   schedulerAddTask( AccesosActualizar, puerta, 0, 10);
 
    // Se agrega la tarea tarea2 al planificador
-   // schedulerAddTask( task1_Update, (void*)LED1, 1, 500 );
-
-   // Se agrega la tarea tarea3 al planificador
-   // schedulerAddTask( task1_Update, (void*)LED2, 2, 1000 );
+   schedulerAddTask( PulsadorActualizar, pulsador, 5, 10 );
 
    // FUNCION que inicializa la interrupcion que ejecuta el planificador de
    // tareas con tick cada 1ms.

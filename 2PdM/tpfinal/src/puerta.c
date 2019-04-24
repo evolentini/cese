@@ -17,25 +17,35 @@
 /* === Inclusiones de cabeceras ================================================================ */
 #include <string.h>
 #include "puerta.h"
+#include "digitales.h"
 
 /* === Definicion y Macros ===================================================================== */
 
 /* == Declaraciones de tipos de datos internos ================================================= */
 
-/** @brief Estrcutura que describe la información de una tecla */
+//! Estrcutura que describe la información de una puerta
 struct puerta_s {
-    puerta_configuracion_t configuracion;
-    puerta_estado_t estado;
-    puerta_evento_t evento;
-    uint32_t temporizador; 
+    puerta_configuracion_t configuracion;   //!< Parametros de configuracion de la puerta
+    puerta_estado_t estado;                 //!< Estado actual de la puerta
+    puerta_evento_t evento;                 //!< Funcion para informar un evento de puerta
+    entrada_t abierta;                      //!< Entrada digital del sensor de puerta abierta
+    entrada_t bloqueada;                    //!< Entrada digital del sensor de mecanismo bloqueado
+    entrada_t liberada;                     //!< Entrada digital del sensor de mecanismo liberado
+    uint32_t temporizador;                  //!< Valor del temporizador cuando expire la espera
 };
 
 /* === Definiciones de variables internas ====================================================== */
 
-/** @brief Variable con el descriptor de la puerta */
+//! Variable con el descriptor de la puerta
 static struct puerta_s puerta = {0};
 
 /* === Declaraciones de funciones internas ===================================================== */
+
+/** @brief Busca un nuevo descriptor de entrada sin usar
+ *
+ * @return      Descriptor del estado de la entrada
+ */
+puerta_t PuertaNueva(void);
 
 /* === Definiciones de funciones internas ====================================================== */
 puerta_t PuertaNueva(void) {
@@ -52,13 +62,20 @@ puerta_t PuertaConfigurar(const puerta_configuracion_t * configuracion, puerta_e
         self->evento = evento;
         self->temporizador = 0; 
 
-        gpioConfig(self->configuracion.entradas.abierta, GPIO_INPUT_PULLUP);
-        gpioConfig(self->configuracion.entradas.bloqueada, GPIO_INPUT_PULLUP);
-        gpioConfig(self->configuracion.entradas.liberada, GPIO_INPUT_PULLUP);
-
         gpioConfig(self->configuracion.salidas.directa, GPIO_OUTPUT);
         gpioConfig(self->configuracion.salidas.directa, GPIO_OUTPUT);
         gpioConfig(self->configuracion.salidas.alarma, GPIO_OUTPUT);
+
+        if (self->configuracion.opciones.sensor) {
+            gpioConfig(self->configuracion.entradas.abierta, GPIO_INPUT_PULLUP);
+            self->abierta = EntradaConfigurar(self->configuracion.entradas.abierta, NULL, NULL);
+        }
+        if (self->configuracion.opciones.mecanismo) {
+            gpioConfig(self->configuracion.entradas.bloqueada, GPIO_INPUT_PULLUP);
+            gpioConfig(self->configuracion.entradas.liberada, GPIO_INPUT_PULLUP);
+            self->bloqueada = EntradaConfigurar(self->configuracion.entradas.bloqueada, NULL, NULL);
+            self->liberada = EntradaConfigurar(self->configuracion.entradas.liberada, NULL, NULL);
+        }
     }
     return self;
 }
@@ -71,11 +88,11 @@ puerta_estado_t PuertaActualizar(puerta_t self) {
     bool bloqueada = FALSE;
 
     if (self->configuracion.opciones.sensor) {
-        abierta = !gpioRead(self->configuracion.entradas.abierta);
+        abierta = EntradaActualizar(self->abierta);
     }
     if (self->configuracion.opciones.mecanismo) {
-        liberada = !gpioRead(self->configuracion.entradas.liberada);
-        bloqueada = !gpioRead(self->configuracion.entradas.bloqueada);
+        liberada = EntradaActualizar(self->liberada);
+        bloqueada = EntradaActualizar(self->bloqueada);
     }
 
     switch (self->estado) {
